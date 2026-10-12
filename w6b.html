@@ -1,0 +1,326 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset="utf-8"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<title>PORTFOLIO</title>
+		<link rel="stylesheet" type="text/css" href="css/w6b.css">
+		<!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+		<!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+		<link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+		<style type="text/css">
+			    * {
+      box-sizing: border-box;
+      
+    }
+    
+    img{
+      width: 100%;
+    }
+    
+    .grid{
+      z-index: -10;
+      position: absolute;
+      left: 0;
+      top:0;
+    }	
+    .side{
+      width: 50vw;
+    }
+    
+    .all{
+      margin-left: 5.5vw;
+      margin-top: 2.75vw;
+      margin-right: 5.5vw;
+      /*border: 2px solid black;*/
+      display: flex;
+    }
+    .logo{
+      width: 50%;
+      padding: 2.5vw;
+    }
+    
+    .menu{
+      justify-content: flex-end;
+      display: flex;
+      /*border: 2px solid black;*/
+      width: 50%;
+    }
+    .worksbox{
+      padding: 2.5vw;	
+    }
+    .works{
+      font-size: 3vw;
+      text-decoration: none;
+      color: #CF2F99;				
+    }
+    .works:hover{
+      color: #008C84;
+    }
+    
+    .infobox{
+      padding: 2.5vw;
+    }
+    .info{
+      font-size: 3vw;
+      text-decoration: none;
+      color: #008C84;
+    }
+    .info:hover{
+      color: #CF2F99;
+    }
+    
+    #works{
+      /*border: 2px solid black;*/
+      justify-content: flex-end;	
+      margin-top: 6.5vw;
+      margin-left: 8vw;
+      margin-right: 8vw;
+      display: flex;
+      font-size: 6vw;
+      color: #cf2f99;
+    }
+    
+    
+    
+    
+    #info{
+      margin-top: 7.5vw;
+      font-size: 6vw;
+      color: #008C84;
+      margin-left: 8vw;
+      margin-right: 8vw;
+      display: flex;
+    }
+    
+  </style>
+</head>
+
+<body>
+  <!-- <div class="grid">
+    <img src="img/grid.jpg">
+  </div> -->
+  <div>
+	<span class="cursor"></span>
+</div>
+  
+  <div class="all">
+    <div class="side">
+      <img class="logo" src="img/logo.svg">
+    </div>
+    <div class="menu">
+		<div class="worksbox">
+			<a class="works" href="A3.html#works">works</a>
+		  </div>
+		  <div class="infobox">
+			<a class="info" href="A3.html#info">info</a>
+		  </div>
+    </div>
+  </div>
+  
+  
+  <div class="title">
+    <h1>album cover</h1>
+  </div>
+  <div class="font">
+    <h2> <span style="color:#008C84">fonts:</span> bd geminis regular/ tachyon thin</h2>
+  </div>
+    <div class="text">
+      <p>created using on Adobe Illustrator<br> by collecting random words and stock images</p>		
+    </div>
+
+		<div class="container">
+			<canvas id="canvas" width="1000" height="1000"></canvas>
+			<div id="palette"></div>
+		</div>
+		  
+		  
+		  
+		  <div class="scr">
+			<img src="img/scr2.png">
+		  </div>
+		  
+		  
+		  <div class="pic">
+			<img src="img/w6b.jpg">
+		  </div>
+		  
+		  
+		</body>
+
+<script>
+const buildPalette = (colorsList) => {
+  const paletteContainer = document.getElementById("palette");
+  paletteContainer.innerHTML = "";
+
+  const orderedByColor = orderByLuminance(colorsList);
+
+  for (let i = 0; i < orderedByColor.length; i++) {
+    const hexColor = rgbToHex(orderedByColor[i]);
+
+    if (i > 0) {
+      const difference = calculateColorDifference(
+        orderedByColor[i],
+        orderedByColor[i - 1]
+      );
+      if (difference < 120) {
+        continue;
+      }
+    }
+
+    const colorElement = document.createElement("div");
+    colorElement.style.backgroundColor = hexColor;
+    colorElement.appendChild(document.createTextNode(hexColor));
+    paletteContainer.appendChild(colorElement);
+  }
+};
+
+const rgbToHex = (pixel) => {
+  const componentToHex = (c) => {
+    const hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  };
+
+  return (
+    "#" +
+    componentToHex(pixel.r) +
+    componentToHex(pixel.g) +
+    componentToHex(pixel.b)
+  ).toUpperCase();
+};
+
+const orderByLuminance = (rgbValues) => {
+  const calculateLuminance = (p) => {
+    return 0.2126 * p.r + 0.7152 * p.g + 0.0722 * p.b;
+  };
+
+  return rgbValues.sort((p1, p2) => {
+    return calculateLuminance(p2) - calculateLuminance(p1);
+  });
+};
+
+const buildRgb = (imageData) => {
+  const rgbValues = [];
+  for (let i = 0; i < imageData.length; i += 4) {
+    const rgb = {
+      r: imageData[i],
+      g: imageData[i + 1],
+      b: imageData[i + 2],
+    };
+
+    rgbValues.push(rgb);
+  }
+
+  return rgbValues;
+};
+
+const calculateColorDifference = (color1, color2) => {
+  const rDifference = Math.pow(color2.r - color1.r, 2);
+  const gDifference = Math.pow(color2.g - color1.g, 2);
+  const bDifference = Math.pow(color2.b - color1.b, 2);
+
+  return rDifference + gDifference + bDifference;
+};
+
+const findBiggestColorRange = (rgbValues) => {
+  let rMin = Number.MAX_VALUE;
+  let gMin = Number.MAX_VALUE;
+  let bMin = Number.MAX_VALUE;
+
+  let rMax = Number.MIN_VALUE;
+  let gMax = Number.MIN_VALUE;
+  let bMax = Number.MIN_VALUE;
+
+  rgbValues.forEach((pixel) => {
+    rMin = Math.min(rMin, pixel.r);
+    gMin = Math.min(gMin, pixel.g);
+    bMin = Math.min(bMin, pixel.b);
+
+    rMax = Math.max(rMax, pixel.r);
+    gMax = Math.max(gMax, pixel.g);
+    bMax = Math.max(bMax, pixel.b);
+  });
+
+  const rRange = rMax - rMin;
+  const gRange = gMax - gMin;
+  const bRange = bMax - bMin;
+
+  const biggestRange = Math.max(rRange, gRange, bRange);
+  if (biggestRange === rRange) {
+    return "r";
+  } else if (biggestRange === gRange) {
+    return "g";
+  } else {
+    return "b";
+  }
+};
+
+const quantization = (rgbValues, depth) => {
+  const MAX_DEPTH = 4;
+
+  // Base case
+  if (depth === MAX_DEPTH || rgbValues.length === 0) {
+    const color = rgbValues.reduce(
+      (prev, curr) => {
+        prev.r += curr.r;
+        prev.g += curr.g;
+        prev.b += curr.b;
+
+        return prev;
+      },
+      {
+        r: 0,
+        g: 0,
+        b: 0,
+      }
+    );
+
+    color.r = Math.round(color.r / rgbValues.length);
+    color.g = Math.round(color.g / rgbValues.length);
+    color.b = Math.round(color.b / rgbValues.length);
+
+    return [color];
+  }
+  const componentToSortBy = findBiggestColorRange(rgbValues);
+  rgbValues.sort((p1, p2) => {
+    return p1[componentToSortBy] - p2[componentToSortBy];
+  });
+
+  const mid = rgbValues.length / 2;
+  return [
+    ...quantization(rgbValues.slice(0, mid), depth + 1),
+    ...quantization(rgbValues.slice(mid + 1), depth + 1),
+  ];
+};
+
+const main = () => {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext('2d')
+  const image = new Image();
+  
+
+  image.onload = () => {
+    ctx.drawImage(image, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const rgbArray = buildRgb(imageData.data);
+    const quantColors = quantization(rgbArray, 0);
+
+    buildPalette(quantColors);
+  }
+			
+			image.crossOrigin = "Anonymous";
+			image.src = "https://i.ibb.co/mR4L1zk/heart.png";
+			
+			canvas.onclick = () => {
+			  if (image.src.match("w6b")) {
+				image.src = "https://i.ibb.co/mR4L1zk/heart.png";
+			  } else {
+				image.src = "https://i.ibb.co/92NPWgT/w6b.jpg";
+			  }
+			}
+		  };
+		  
+		  main();
+</script>
+</html>
+<script src="js/cursor.js"></script>
